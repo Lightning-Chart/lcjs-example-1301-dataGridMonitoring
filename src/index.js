@@ -4,7 +4,14 @@ const xydata = require('@arction/xydata')
 const { AxisScrollStrategies, AxisTickStrategies, lightningChart, LegendBoxBuilders, Themes } = lcjs
 const { createProgressiveTraceGenerator } = xydata
 
-const dashboard = lightningChart().Dashboard({
+let license = undefined
+try {
+    license = LCJS_LICENSE
+} catch (e) {}
+
+const dashboard = lightningChart({
+    license: license,
+}).Dashboard({
     // theme: Themes.darkGold
     numberOfRows: 1,
     numberOfColumns: 2,
