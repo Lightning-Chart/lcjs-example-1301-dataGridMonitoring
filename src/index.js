@@ -38,7 +38,7 @@ chartXY
         ticks.setTimeOrigin(((timeOriginDate.getHours() * 60 + timeOriginDate.getMinutes()) * 60 + timeOriginDate.getSeconds()) * 1000),
     )
     .setScrollStrategy(AxisScrollStrategies.progressive)
-    .setInterval({ start: -10 * 1000, end: 0, stopAxisAfter: false })
+    .setDefaultInterval((state) => ({ end: state.dataMax, start: (state.dataMax ?? 0) - 10 * 1000, stopAxisAfter: false }))
     .setAnimationScroll(false)
 
 const seriesSMA = chartXY
