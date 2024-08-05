@@ -1,5 +1,5 @@
-const lcjs = require('@arction/lcjs')
-const xydata = require('@arction/xydata')
+const lcjs = require('@lightningchart/lcjs')
+const xydata = require('@lightningchart/xydata')
 
 const { AxisScrollStrategies, AxisTickStrategies, lightningChart, LegendBoxBuilders, Themes } = lcjs
 const { createProgressiveTraceGenerator } = xydata
