@@ -1,18 +1,13 @@
 const lcjs = require('@lightningchart/lcjs')
 const xydata = require('@lightningchart/xydata')
 
-const { AxisScrollStrategies, AxisTickStrategies, lightningChart, LegendBoxBuilders, Themes } = lcjs
+const { AxisScrollStrategies, AxisTickStrategies, lightningChart, LegendBoxBuilders, emptyFill, Themes } = lcjs
 const { createProgressiveTraceGenerator } = xydata
-
-let license = undefined
-try {
-    license = LCJS_LICENSE
-} catch (e) {}
 
 // NOTE: Using `Dashboard` is no longer recommended for new applications. Find latest recommendations here: https://lightningchart.com/js-charts/docs/basic-topics/grouping-charts/
 const dashboard = lightningChart({
-    license: license,
-}).Dashboard({
+            resourcesBaseUrl: new URL(document.head.baseURI).origin + new URL(document.head.baseURI).pathname + 'resources/',
+        }).Dashboard({
     theme: Themes[new URLSearchParams(window.location.search).get('theme') || 'darkGold'] || undefined,
     numberOfRows: 1,
     numberOfColumns: 2,
@@ -42,23 +37,21 @@ chartXY
     .setAnimationScroll(false)
 
 const seriesSMA = chartXY
-    .addLineSeries({
-        dataPattern: {
-            pattern: 'ProgressiveX',
-        },
+    .addPointLineAreaSeries({
+        dataPattern: 'ProgressiveX',
         automaticColorIndex: 3,
     })
-    .setDataCleaning({ minDataPointCount: 1 })
+    .setAreaFillStyle(emptyFill)
+    .setMaxSampleCount(10_000)
     .setName('Moving average')
 
 const seriesValue = chartXY
-    .addLineSeries({
-        dataPattern: {
-            pattern: 'ProgressiveX',
-        },
+    .addPointLineAreaSeries({
+        dataPattern: 'ProgressiveX',
         automaticColorIndex: 0,
     })
-    .setDataCleaning({ minDataPointCount: 1 })
+    .setAreaFillStyle(emptyFill)
+    .setMaxSampleCount(10_000)
     .setName('Value')
 
 const legend = chartXY.addLegendBox(LegendBoxBuilders.HorizontalLegendBox).add(chartXY)
