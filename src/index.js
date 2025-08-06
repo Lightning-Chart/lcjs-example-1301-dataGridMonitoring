@@ -1,7 +1,7 @@
 const lcjs = require('@lightningchart/lcjs')
 const xydata = require('@lightningchart/xydata')
 
-const { AxisScrollStrategies, AxisTickStrategies, lightningChart, LegendBoxBuilders, emptyFill, Themes } = lcjs
+const { AxisScrollStrategies, AxisTickStrategies, lightningChart, LegendPosition, emptyFill, Themes } = lcjs
 const { createProgressiveTraceGenerator } = xydata
 
 // NOTE: Using `Dashboard` is no longer recommended for new applications. Find latest recommendations here: https://lightningchart.com/js-charts/docs/basic-topics/grouping-charts/
@@ -19,6 +19,7 @@ const chartXY = dashboard
         rowIndex: 0,
         columnSpan: 1,
         rowSpan: 1,
+        legend: { position: LegendPosition.TopRight },
     })
     .setTitle('ChartXY')
 
@@ -32,29 +33,23 @@ chartXY
     .setTickStrategy(AxisTickStrategies.Time, (ticks) =>
         ticks.setTimeOrigin(((timeOriginDate.getHours() * 60 + timeOriginDate.getMinutes()) * 60 + timeOriginDate.getSeconds()) * 1000),
     )
-    .setScrollStrategy(AxisScrollStrategies.progressive)
+    .setScrollStrategy(AxisScrollStrategies.scrolling)
     .setDefaultInterval((state) => ({ end: state.dataMax, start: (state.dataMax ?? 0) - 10 * 1000, stopAxisAfter: false }))
     .setAnimationScroll(false)
 
 const seriesSMA = chartXY
-    .addPointLineAreaSeries({
-        dataPattern: 'ProgressiveX',
+    .addLineSeries({
         automaticColorIndex: 3,
     })
-    .setAreaFillStyle(emptyFill)
     .setMaxSampleCount(10_000)
     .setName('Moving average')
 
 const seriesValue = chartXY
-    .addPointLineAreaSeries({
-        dataPattern: 'ProgressiveX',
+    .addLineSeries({
         automaticColorIndex: 0,
     })
-    .setAreaFillStyle(emptyFill)
     .setMaxSampleCount(10_000)
     .setName('Value')
-
-const legend = chartXY.addLegendBox(LegendBoxBuilders.HorizontalLegendBox).add(chartXY)
 
 const dataGrid = dashboard
     .createDataGrid({
@@ -97,8 +92,8 @@ createProgressiveTraceGenerator()
         const sma = lastNSamples.reduce((prev, cur) => prev + cur, 0) / lastNSamples.length
 
         // Add new data point to XY line series.
-        seriesValue.add(sample)
-        seriesSMA.add({ x: sample.x, y: sma })
+        seriesValue.appendSample(sample)
+        seriesSMA.appendSample({ x: sample.x, y: sma })
 
         // Add new Row into DataGrid for the data point.
         const sampleDateTime = new Date(sample.x + timeOrigin)
